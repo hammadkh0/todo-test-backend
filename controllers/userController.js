@@ -55,3 +55,22 @@ exports.login = async (req, res) => {
     res.status(400).json({ status: "fail", message: error.message });
   }
 };
+
+exports.protect = (req, res, next) => {
+  if (!req.headers.authorization) {
+    return res.status(401).json({ status: "fail", message: "Token not provided" });
+  } else {
+    const token = req.headers.authorization.split(" ")[1];
+    jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
+      if (err) {
+        return res
+          .status(401)
+          .json({ status: "fail", message: "You are not logged in. Please log in to get access." });
+      } else {
+        const user = await User.findById(decoded.id);
+        req.user = user;
+        next();
+      }
+    });
+  }
+};
