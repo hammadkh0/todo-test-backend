@@ -4,6 +4,7 @@ const {
   createTodo,
   saveAllTodos,
   deleteTodo,
+  updateTodo,
 } = require("../controllers/todoController");
 const { protect } = require("../controllers/userController");
 
@@ -14,4 +15,5 @@ router.get("/", getAllTodos);
 router.post("/", createTodo);
 router.post("/saveAll", saveAllTodos);
 router.delete("/:id", deleteTodo);
+router.patch("/:id", updateTodo);
 module.exports = router;

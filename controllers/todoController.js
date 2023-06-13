@@ -49,3 +49,15 @@ exports.deleteTodo = async (req, res) => {
     res.status(404).json({ message: error.message });
   }
 };
+
+exports.updateTodo = async (req, res) => {
+  try {
+    const todo = await Todo.findById(req.params.id);
+    todo.completed = !todo.completed;
+    todo.completedAt = todo.completed ? new Date().toISOString() : null;
+    await todo.save();
+    res.status(200).json({ status: "success", todo });
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+};
