@@ -25,14 +25,26 @@ exports.createTodo = async (req, res) => {
 
 exports.saveAllTodos = async (req, res) => {
   try {
-    const allTodos = await Todo.insertMany(req.body);
+    // 1. get all todos from req.body
+    const todosToSave = req.body.todos;
+    // 2. get all the user's todos from db and filter out only their titles
+    let userTodos = await req.user.populate("todos");
+    userTodos = userTodos.todos.map((todo) => todo.title);
+    // 3. filter out only the todos that are not in the user's todos
+    const uniqueTodos = todosToSave.filter((todo) => !userTodos.includes(todo.title));
+    // 4. if there are no new todos to save, return
+    if (uniqueTodos.length === 0) {
+      return res.status(200).json({ status: "fail", message: "No new todos to save" });
+    }
+    // 5. save the new todos to db
+    const savedTodos = await Todo.insertMany(uniqueTodos);
     const user = req.user;
-    // populate user with todos
-    user.todos = [...user.todos, ...allTodos];
+    // populate user with the new todos
+    user.todos = [...user.todos, ...savedTodos];
     await user.save();
-    res.status(201).json({ status: "success", allTodos });
+    res.status(201).json({ status: "success", savedTodos });
   } catch (error) {
-    res.status(400).json({ status: "fail", message: error.message });
+    res.status(500).json({ status: "fail", message: error.message });
   }
 };
 
