@@ -54,6 +54,7 @@ exports.saveAllTodos = async (req, res) => {
 exports.deleteTodo = async (req, res) => {
   try {
     const todoId = req.params.id;
+    // delete todo from db and return it.
     const todo = await Todo.findByIdAndDelete(todoId);
     const user = req.user;
     // remove todo from user
@@ -68,6 +69,7 @@ exports.deleteTodo = async (req, res) => {
 exports.updateTodo = async (req, res) => {
   try {
     const todo = await Todo.findById(req.params.id);
+    // update the todo fields
     todo.completed = !todo.completed;
     todo.completedAt = todo.completed ? new Date().toISOString() : null;
     await todo.save();

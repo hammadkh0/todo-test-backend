@@ -67,8 +67,11 @@ exports.protect = (req, res, next) => {
           .status(401)
           .json({ status: "fail", message: "You are not logged in. Please log in to get access." });
       } else {
+        // get the user from db based on token id
         const user = await User.findById(decoded.id);
+        // add user to req object
         req.user = user;
+        // call next middleware and now it will contain the user object
         next();
       }
     });
