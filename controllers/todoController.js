@@ -3,7 +3,10 @@ const User = require("../models/userModel");
 
 exports.getAllTodos = async (req, res) => {
   try {
-    const allTodos = await Todo.find();
+    const userTodos = req.user.todos;
+    // get the todos present in user
+    const allTodos = await Todo.find({ _id: { $in: userTodos } });
+
     res.status(200).json(allTodos);
   } catch (error) {
     res.status(404).json({ message: error.message });
